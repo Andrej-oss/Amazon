@@ -5,9 +5,9 @@ module.exports = {
 
   deploy : {
     production : {
-      key  : 'ohio4.pem',
+      key  : 'ohio_key1.pem',
       user : 'ubuntu',
-      host : '13.59.210.208',
+      host : '18.223.121.186',
       ref  : 'origin/main',
       repo : 'git@github.com:Andrej-oss/Amazon.git',
       path : '/home/ubuntu',
