@@ -12,7 +12,7 @@ module.exports = {
       repo : 'git@github.com:Andrej-oss/Amazon.git',
       path : '/home/ec2-user',
       'pre-deploy-local': '',
-      'post-deploy' : 'source ~/.nvm/nvm.sh && npm install --force && pm2 reload ecosystem.config.js --env production',
+      'post-deploy' : 'source ~/.nvm/nvm.sh && npm install --force && npm run build && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh_option' : 'forwardAgent=yes'
     }
