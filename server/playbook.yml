@@ -1,0 +1,67 @@
+---
+- name: Configure, install and deploy Amazon application
+  hosts: PROD_SERVER
+
+  vars:
+    source_file: /home/sawyer/IdeaProjects/Amazon/server/amazon.conf
+    dest_folder: /etc/nginx/conf.d/
+
+  tasks:
+    - name: Ping server
+      ping:
+
+    - name: Installing nvm to server
+      shell: >
+        curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+        creates=/home/{{ ansible_user_id }}/.nvm/nvm.sh
+
+    - name: Reloading the bashrc and installing Node v18.13.0
+      shell: >
+         /bin/bash -c "source ~/.bashrc &&  nvm install 18.13.0"
+
+    - name: Installing GIT and NGINX
+      yum: name={{ item }} state=installed
+      loop:
+        - git
+        - nginx
+      become: yes
+
+    - name: Start NGINX server
+      service: name=nginx state=started
+      become: yes
+
+    - name: Copy nginx config server file to server
+      copy: src={{ source_file }} dest={{ dest_folder }} mode=444
+      become: yes
+      notify: Restart NGINX server
+
+#    - name: Cloning git amazon repository
+#      shell: 'git clone https://github.com/Andrej-oss/Amazon.git'
+
+    - name: Installing globally pm2
+      shell: npm i pm2 -g
+
+    - name: Installing dependencies
+      shell: npm i --force
+      args:
+        chdir: /home/ec2-user/Amazon/
+
+    - name: Building Amazon application
+      shell: npm run build
+      args:
+        chdir: /home/ec2-user/Amazon/
+
+    - name: Start pm2 process deploying Amazon
+      shell: pm2 start 'npm start' --name amazon
+      args:
+        chdir: /home/ec2-user/Amazon/
+      notify: Restart NGINX server
+
+    - name: Allow http connect to server
+      shell: setsebool -P httpd_can_network_connect on
+      become: yes
+
+  handlers:
+    - name: Restart NGINX server
+      service: name=nginx state=restarted
+      become: yes
