@@ -35,8 +35,8 @@
       become: yes
       notify: Restart NGINX server
 
-#    - name: Cloning git amazon repository
-#      shell: 'git clone https://github.com/Andrej-oss/Amazon.git'
+    - name: Cloning git amazon repository
+      shell: 'git clone https://github.com/Andrej-oss/Amazon.git'
 
     - name: Installing globally pm2
       shell: npm i pm2 -g
